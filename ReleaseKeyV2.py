@@ -13,7 +13,14 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from pyfiglet import Figlet
 from datetime import datetime
-import requests
+
+VALID_KEYS = {
+    "lFa8J7mP3qpSITC",
+    "Xghq5UWyhHQpX9n",
+    "IZxOPMBAlAufzTG",
+    "jax2Wt5gMgOYmBu",
+    "VSyQXy0pijhEkJ6"
+}
 
 class LuxHitterApp:
     def __init__(self):
@@ -48,15 +55,6 @@ class LuxHitterApp:
         self.clear_console()
         self.show_hitting_screen()
 
-    def reset_counters(self):
-        """Restablecer contadores a sus valores por defecto."""
-        self.invalid_count = 0
-        self.twofa_count = 0
-        self.error_count = 0
-        self.generic_error_count = 0
-        self.results = []
-        self.checked_accounts = 0
-
     def run(self):
         self.clear_console()
         self.show_ascii_title()
@@ -66,7 +64,6 @@ class LuxHitterApp:
         while True:
             self.clear_console()
             self.show_ascii_title()
-            self.reset_counters()  # Restablecer contadores cada vez que se regresa al menú
             self.print_main_menu()
             choice = input("\033[92mChoose an option: \033[0m").strip()
 
@@ -86,40 +83,17 @@ class LuxHitterApp:
         print(f"\033[92m{ascii_title}\033[0m")
 
     def login(self):
-        access_token = "WyI5MTc2MDAyNCIsInp0ZytabmhyVWRxcW5aN1NOMlF5ZDdpVDJEU3M5VCtrb01tNlptOFgiXQ=="
-        product_id = 27090
-
-        while not self.logged_in:
-            self.clear_console()
-            self.show_ascii_title()
-            print("\033[92mWelcome to Lux Hitter - Secure Login\033[0m")
-            license_key = input("\033[92mEnter License Key: \033[0m").strip()
-
-            url = "https://api.cryptolens.io/api/key/Activate"
-            data = {
-                "token": access_token,
-                "ProductId": product_id,
-                "Key": license_key,
-                "MachineCode": "SOME-MACHINE-CODE"  # Puedes personalizar este código de máquina si es necesario
-            }
-
-            try:
-                response = requests.post(url, data=data)
-                if response.status_code == 200:
-                    result = response.json()
-                    if result.get("result") == 0:
-                        print("\033[92mAccess Granted! Redirecting to the main menu...\033[0m")
-                        time.sleep(2)
-                        self.logged_in = True
-                    else:
-                        print(f"\033[91mLogin failed: {result.get('message')}\033[0m")
-                else:
-                    print(f"\033[91mError in request: Status Code {response.status_code}\033[0m")
-            except Exception as e:
-                print(f"\033[91mAn error occurred: {str(e)}\033[0m")
-
-            if not self.logged_in:
-                input("\033[92mPress Enter to try again...\033[0m")
+        self.clear_console()
+        self.show_ascii_title()
+        print("\033[92mWelcome to Lux Hitter - Secure Login\033[0m")
+        key = input("\033[92mEnter Access Key: \033[0m").strip()
+        if key in VALID_KEYS:
+            print("\033[92mAccess Granted! Redirecting to the main menu...\033[0m")
+            time.sleep(2)
+            self.logged_in = True
+        else:
+            print("\033[91mInvalid Key. Please try again.\033[0m")
+            time.sleep(2)
 
     def hitter_workflow(self):
         self.clear_console()

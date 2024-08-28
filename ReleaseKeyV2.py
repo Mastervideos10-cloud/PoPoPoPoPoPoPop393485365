@@ -387,7 +387,7 @@ class LuxHitterApp:
     def load_proxies_v2(self):
         self.clear_console()
         self.show_ascii_title()
-        print("\033[92mLoad Proxies (v2)\033[0m")
+        print("\033[92mLAAAAAoad Proxies (v2)\033[0m")
         file_path = self.open_file_dialog("Select the proxies file")
         if file_path:
             with open(file_path, "r") as file:

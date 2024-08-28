@@ -721,39 +721,4 @@ class LuxHitterApp:
         chrome_options.add_argument('--incognito')
 
         if proxy:
-            chrome_options.add_argument(f'--proxy-server=http://{proxy}')
-
-        return webdriver.Chrome(options=chrome_options)
-
-    def clear_console(self):
-        os.system('cls' if os.name == 'nt' else 'clear')
-
-    def print_main_menu(self):
-        print("\033[92m1. Hitter (v1)\033[0m")
-        print("\033[92m2. Hitter v2 - (Less Hitrate)\033[0m")
-        print("\033[92m3. Exit\033[0m")
-        print("="*40)
-        print()
-
-    def show_main_menu(self):
-        self.clear_console()
-        self.show_ascii_title()
-        self.print_main_menu()
-
-    def print_status_v1(self):
-        while self.refresh_thread_v1 is not None:
-            self.update_status_v1()
-            time.sleep(0.5)
-
-    def print_status_v2(self):
-        while self.refresh_thread_v2 is not None:
-            self.update_status_v2()
-            time.sleep(0.5)
-
-if __name__ == "__main__":
-    try:
-        app = LuxHitterApp()
-        app.run()
-    except Exception as e:
-        print(f"Critical error: {e}")
-        input("Press Enter to exit...")
+            chrome_options.add_argument(f'--proxy-server=http://{proxy}'

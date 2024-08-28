@@ -107,7 +107,7 @@ def check_for_updates()
         update_script()
         restart_script()
 
-class LuxHitterApp
+class LuxHitterAppPPPPPPPPPPPPPPPPPPPPP
     def __init__(self)
         temp_dir = tempfile.gettempdir()
         self.machine_code_file = os.path.join(temp_dir, machine_code.json)
